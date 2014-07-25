@@ -100,7 +100,7 @@ class Scan(Frame):
             tkMessageBox.showerror(u"Erreur", u"Démarrez et préparez le programme HR Scanner")
             sys.exit()
         #tkMessageBox.showwarning(u"Attention", u"Effectuez au moins 1 scan pour que la fenêtre s'appelle Job...")
-        self.usb = serial.Serial(self.port.get(), 9600, timeout = 10)                                                   # TODO 115200
+        self.usb = serial.Serial(self.port.get(), 115200, timeout = 10)
 
 
     def _zero(self):

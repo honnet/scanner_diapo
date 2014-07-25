@@ -103,7 +103,7 @@ void setup() {
     pinMode(X_ZEROSENSOR, INPUT);
     pinMode(X_SWITCH,     INPUT);
 
-    Serial.begin(9600);                                                      // TODO 115200
+    Serial.begin(115200);
     //digitalWrite(X_DIRECTION, HIGH);
     //digitalWrite(X_ENABLE, HIGH);
 
