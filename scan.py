@@ -2,6 +2,7 @@
 # Copyright 2011 Christophe Combelles <ccomb@gorfou.fr>
 # Ce programme est distribué selon les termes de la licence GNU GPL v3
 # Voir http://www.gnu.org/licenses/gpl.html
+
 from Tkinter import *
 import tkMessageBox
 import tkFileDialog, tkMessageBox
@@ -11,7 +12,7 @@ from pywinauto import application, timings, MatchError
 timings.Timings.Fast()
 timings.Timings.window_find_timeout = 1
 
-VERSION="1.1"
+VERSION = "1.1"
 PORT = 'COM5'
 
 class Scan(Frame):
@@ -23,16 +24,16 @@ class Scan(Frame):
 
         # widgets
 
-        self.title = Label(self, text=u"scan version %s" % VERSION)
+        self.title = Label(self, text = u"scan version %s" % VERSION)
 
-        self.port_label = Label(self, text=u"Port")
+        self.port_label = Label(self, text = u"Port")
         self.port = StringVar()
         self.port.set(PORT)
-        self.port_entry = Entry(self, textvariable=self.port)
+        self.port_entry = Entry(self, textvariable = self.port)
 
-        self.zero_button = Button(self, text=u"Return to zero",
+        self.zero_button = Button(self, text = u"Return to zero",
                                     command = self._zero)
-        self.scan_button = Button(self, text=u"Scan",
+        self.scan_button = Button(self, text = u"Scan",
                                     command = self._scan)
         self.path = None
         self.directory = StringVar()
@@ -40,55 +41,55 @@ class Scan(Frame):
         if os.path.exists('saved_dir.txt'):
             self.path = open('saved_dir.txt').read()
             self.directory.set(self.path)
-        self.path_label = Label(self, text=u"Sélectionnez le même répertoire d'images\n"
+        self.path_label = Label(self, text = u"Sélectionnez le même répertoire d'images\n"
                                            u"que dans le programme Kodak")
-        self.path_button = Button(self, textvariable=self.directory,
+        self.path_button = Button(self, textvariable = self.directory,
                                   command = self._choose_path)
 
-        self.nbtours_label = Label(self, text=u"Nb de tours moteur par image")
+        self.nbtours_label = Label(self, text = u"Nb de tours moteur par image")
         self.nbtours = IntVar()
         self.nbtours.set(1)
-        self.nbtours_entry = Entry(self, width=3, textvariable=self.nbtours)
+        self.nbtours_entry = Entry(self, width = 3, textvariable = self.nbtours)
 
-        self.delay_label = Label(self, text=u"Nb secondes d'attente à la fin du scan")
+        self.delay_label = Label(self, text = u"Nb secondes d'attente à la fin du scan")
         self.delay = IntVar()
         self.delay.set(1)
-        self.delay_entry = Entry(self, width=3, textvariable=self.delay)
+        self.delay_entry = Entry(self, width = 3, textvariable = self.delay)
 
         self.images = StringVar()
         self.images.set('1-3,10-13')
-        self.images_label = Label(self, text=u"Séquence d'images")
-        self.images_entry = Entry(self, textvariable=self.images)
+        self.images_label = Label(self, text = u"Séquence d'images")
+        self.images_entry = Entry(self, textvariable = self.images)
 
-        self.ice_label = Label(self, text=u"Traitement infrarouge ICE\n(Il faut sélectionner ICE aussi sur HR Scanner)")
+        self.ice_label = Label(self, text = u"Traitement infrarouge ICE\n(Il faut sélectionner ICE aussi sur HR Scanner)")
         self.ice = StringVar()
         self.ice.set('no')
-        self.ice_checkbutton = Checkbutton(self, variable=self.ice, onvalue="yes", offvalue="no")
+        self.ice_checkbutton = Checkbutton(self, variable = self.ice, onvalue="yes", offvalue="no")
 
         self.position = IntVar()
         self.position.set(0)
-        self.position_label = Label(self, text=u"Position supposée")
-        self.position_entry = Entry(self, width=6, textvariable=self.position, state='disabled')
+        self.position_label = Label(self, text = u"Position supposée")
+        self.position_entry = Entry(self, width = 6, textvariable = self.position, state='disabled')
 
-        
+
         # layout
-        self.title.grid(column=0, row=0, columnspan=3)
-        self.path_label.grid(column=1, row=1, padx=15, pady=15)
-        self.path_button.grid(column=2, row=1, padx=15, pady=15)
-        self.port_label.grid(column=1, row=2, padx=15, pady=15)
-        self.port_entry.grid(column=2, row=2, padx=15, pady=15)
-        self.nbtours_label.grid(column=1, row=3, padx=15, pady=15)
-        self.nbtours_entry.grid(column=2, row=3, padx=15, pady=15)
-        self.delay_label.grid(column=1, row=4, padx=15, pady=15)
-        self.delay_entry.grid(column=2, row=4, padx=15, pady=15)
-        self.images_label.grid(column=1, row=5, padx=15, pady=15)
-        self.images_entry.grid(column=2, row=5, padx=15, pady=15)
-        self.ice_label.grid(column=1, row=6, padx=15, pady=15)
-        self.ice_checkbutton.grid(column=2, row=6, padx=15, pady=15)
-        self.position_label.grid(column=1, row=7, padx=15, pady=15)
-        self.position_entry.grid(column=2, row=7, padx=15, pady=15)
-        self.scan_button.grid(column=3, row=8, padx=15, pady=15)
-        self.zero_button.grid(column=0, row=8, padx=15, pady=15)
+        self.title.grid(column = 0, row = 0, columnspan = 3)
+        self.path_label.grid(column = 1, row = 1, padx = 15, pady = 15)
+        self.path_button.grid(column = 2, row = 1, padx = 15, pady = 15)
+        self.port_label.grid(column = 1, row = 2, padx = 15, pady = 15)
+        self.port_entry.grid(column = 2, row = 2, padx = 15, pady = 15)
+        self.nbtours_label.grid(column = 1, row = 3, padx = 15, pady = 15)
+        self.nbtours_entry.grid(column = 2, row = 3, padx = 15, pady = 15)
+        self.delay_label.grid(column = 1, row = 4, padx = 15, pady = 15)
+        self.delay_entry.grid(column = 2, row = 4, padx = 15, pady = 15)
+        self.images_label.grid(column = 1, row = 5, padx = 15, pady = 15)
+        self.images_entry.grid(column = 2, row = 5, padx = 15, pady = 15)
+        self.ice_label.grid(column = 1, row = 6, padx = 15, pady = 15)
+        self.ice_checkbutton.grid(column = 2, row = 6, padx = 15, pady = 15)
+        self.position_label.grid(column = 1, row = 7, padx = 15, pady = 15)
+        self.position_entry.grid(column = 2, row = 7, padx = 15, pady = 15)
+        self.scan_button.grid(column = 3, row = 8, padx = 15, pady = 15)
+        self.zero_button.grid(column = 0, row = 8, padx = 15, pady = 15)
 
         self.app = application.Application()
         try:
@@ -99,7 +100,7 @@ class Scan(Frame):
             tkMessageBox.showerror(u"Erreur", u"Démarrez et préparez le programme HR Scanner")
             sys.exit()
         #tkMessageBox.showwarning(u"Attention", u"Effectuez au moins 1 scan pour que la fenêtre s'appelle Job...")
-        self.usb = serial.Serial(self.port.get(), 9600, timeout=10)
+        self.usb = serial.Serial(self.port.get(), 9600, timeout = 10)                                                   # TODO 115200
 
 
     def _zero(self):
@@ -185,7 +186,7 @@ class Scan(Frame):
                     print 'waiting for filesize to be the same (%s)' % previous_size
                     previous_size = os.stat(newfile)[6]
                     time.sleep(1)
-                    
+
                 print "waiting %s secs " % str(self.delay.get())
                 time.sleep(self.delay.get())
                 self.position.set(self.position.get() + self.nbtours.get())
@@ -193,8 +194,8 @@ class Scan(Frame):
 
     def _choose_path(self):
         self.path = tkFileDialog.askdirectory(
-            parent=root,
-            title=u'Sélectionnez le répertoire où le programme Kodak stocke les images scannées')
+            parent = root,
+            title = u'Sélectionnez le répertoire où le programme Kodak stocke les images scannées')
         self.directory.set(os.path.basename(self.path))
         with open('saved_dir.txt', 'w') as f:
             f.write(self.path)
