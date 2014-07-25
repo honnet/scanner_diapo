@@ -24,158 +24,157 @@ int value = 0;
 int resp;
 
 boolean readSignal(int sensor) {
-  value = digitalRead(sensor);
-  delay(2);
-  value = value + digitalRead(sensor);
-  delay(2);
-  value = value + digitalRead(sensor);
-  delay(2);
-  value = value + digitalRead(sensor);
-  delay(2);
-  value = value + digitalRead(sensor);
-  delay(2);
-  value = value + digitalRead(sensor);
-  delay(2);
-  value = value + digitalRead(sensor);
-  if (value <= 5) return LOW;
-  if (value > 5
-  ) return HIGH;
+    value = digitalRead(sensor);
+    delay(2);
+    value = value + digitalRead(sensor);
+    delay(2);
+    value = value + digitalRead(sensor);
+    delay(2);
+    value = value + digitalRead(sensor);
+    delay(2);
+    value = value + digitalRead(sensor);
+    delay(2);
+    value = value + digitalRead(sensor);
+    delay(2);
+    value = value + digitalRead(sensor);
+    if (value <= 5) return LOW;
+    if (value > 5
+       ) return HIGH;
 }
 
 void searchZero(long initialSpeed, int searchDirection, unsigned long maxSteps) {
-  unsigned long steps = 0;
-  unsigned long semiperiod;
-  // save previous values
-  int saved_direction = direction;
-  saved_speed = speed;
-   
-  // move step by step until the sensor is found
-  digitalWrite(X_DIRECTION, boolean(searchDirection+1));
-  while(readSignal(X_ZEROSENSOR)==HIGH && steps < maxSteps) {
-    semiperiod = 1000000/initialSpeed/2;
-    digitalWrite(X_PULSE, HIGH);
-    delayMicroseconds(semiperiod);
-    digitalWrite(X_PULSE, LOW);
-    delayMicroseconds(semiperiod);
-    steps = steps + 1; // nb of steps moved
-  }
+    unsigned long steps = 0;
+    unsigned long semiperiod;
+    // save previous values
+    int saved_direction = direction;
+    saved_speed = speed;
+
+    // move step by step until the sensor is found
+    digitalWrite(X_DIRECTION, boolean(searchDirection+1));
+    while(readSignal(X_ZEROSENSOR)==HIGH && steps < maxSteps) {
+        semiperiod = 1000000/initialSpeed/2;
+        digitalWrite(X_PULSE, HIGH);
+        delayMicroseconds(semiperiod);
+        digitalWrite(X_PULSE, LOW);
+        delayMicroseconds(semiperiod);
+        steps = steps + 1; // nb of steps moved
+    }
 }
 
 void moveTo(int target) {
-  unsigned long semiperiod;
-  //Serial.print("moveTo ");
-  //Serial.print(target, DEC);
-  //Serial.print(" speed=");
-  //Serial.println(speed);
-  // choose direction
-  
-  if (target == x) return;
-  if (target > x) {
-    digitalWrite(X_DIRECTION, HIGH);
-    direction = 1;
-  } else {
-    digitalWrite(X_DIRECTION, LOW);
-    direction = -1;
-  }
-  
-  // move to target
-  semiperiod = 1000000/speed/2;
-  for (int i=x; i!=target; i+=direction) {
-    digitalWrite(X_PULSE, HIGH);
-    delayMicroseconds(semiperiod-9);
-    digitalWrite(X_PULSE, LOW);
-    delayMicroseconds(semiperiod-9);
-    x = x + direction;
-  }
+    unsigned long semiperiod;
+    //Serial.print("moveTo ");
+    //Serial.print(target, DEC);
+    //Serial.print(" speed=");
+    //Serial.println(speed);
+    // choose direction
+
+    if (target == x) return;
+    if (target > x) {
+        digitalWrite(X_DIRECTION, HIGH);
+        direction = 1;
+    } else {
+        digitalWrite(X_DIRECTION, LOW);
+        direction = -1;
+    }
+
+    // move to target
+    semiperiod = 1000000/speed/2;
+    for (int i=x; i!=target; i+=direction) {
+        digitalWrite(X_PULSE, HIGH);
+        delayMicroseconds(semiperiod-9);
+        digitalWrite(X_PULSE, LOW);
+        delayMicroseconds(semiperiod-9);
+        x = x + direction;
+    }
 }
 
 void setup() {
 
-  direction = HIGH;
-  pinMode(X_PULSE, OUTPUT);
-  pinMode(X_DIRECTION, OUTPUT);
-  pinMode(X_ENABLE, OUTPUT);
-  pinMode(X_ZEROSENSOR, INPUT);
-  pinMode(X_SWITCH, INPUT);
-  
-  Serial.begin(9600);
-  //digitalWrite(X_DIRECTION, HIGH);
-  //digitalWrite(X_ENABLE, HIGH);
+    direction = HIGH;
+    pinMode(X_PULSE, OUTPUT);
+    pinMode(X_DIRECTION, OUTPUT);
+    pinMode(X_ENABLE, OUTPUT);
+    pinMode(X_ZEROSENSOR, INPUT);
+    pinMode(X_SWITCH, INPUT);
 
-  // search zero at speed 400, forward, 800 steps max
-  searchZero(400, 1, 2*steps_by_rev);
-  Serial.println("setup terminated");
+    Serial.begin(9600);
+    //digitalWrite(X_DIRECTION, HIGH);
+    //digitalWrite(X_ENABLE, HIGH);
+
+    // search zero at speed 400, forward, 800 steps max
+    searchZero(400, 1, 2*steps_by_rev);
+    Serial.println("setup terminated");
 }
 
 void loop() {
 
     // wait and read the serial port signal
     if(!Serial.available()) {
-      delay(100);
-      return;
+        delay(100);
+        return;
     }
     command = String("");
     for (int i=Serial.available(); i>0; i--) {
-      command += char(Serial.read());
+        command += char(Serial.read());
     }
 
     // simple move command
     if (command.substring(0,2) == "go") {
-      nbtours = command.substring(2, command.length()).toInt();
-      // turn N lap
-      moveTo(nbtours*steps_by_rev);
-      x=0;
-      // send a signal to the python gui
-      Serial.println("command go terminated");
-      return;
+        nbtours = command.substring(2, command.length()).toInt();
+        // turn N lap
+        moveTo(nbtours*steps_by_rev);
+        x=0;
+        // send a signal to the python gui
+        Serial.println("command go terminated");
+        return;
     }
-    
+
     // full scan procedure
     if (command.substring(0,2) == "ok" || command.substring(0,2) == "ic") {
-      // run twice in case of ICE
-      for (int i=0; i<=1; i++) {
-        nbtours = command.substring(2, command.length()).toInt();
-        Serial.println("start procedure");
-        // wait for the first opto signal
-        resp = LOW;
-        while (resp != HIGH) {
-          resp = readSignal(X_SWITCH);
-          Serial.print(String(resp));
-          delay(50);
-        }
-        resp = HIGH;
-        while (resp != LOW) {
-          resp = readSignal(X_SWITCH);
-          Serial.print(String(resp));
-          delay(50);
-        }
-  
-        
-        // wait for the second opto signal
-        resp = LOW;
-        while (resp != HIGH) {
-          resp = readSignal(X_SWITCH);
-          Serial.print(String(resp));
-          delay(50);
-        }
-        resp = HIGH;
-        while (resp != LOW) {
-          resp = readSignal(X_SWITCH);
-          Serial.print(String(resp));
-          delay(50);
+        // run twice in case of ICE
+        for (int i=0; i<=1; i++) {
+            nbtours = command.substring(2, command.length()).toInt();
+            Serial.println("start procedure");
+            // wait for the first opto signal
+            resp = LOW;
+            while (resp != HIGH) {
+                resp = readSignal(X_SWITCH);
+                Serial.print(String(resp));
+                delay(50);
+            }
+            resp = HIGH;
+            while (resp != LOW) {
+                resp = readSignal(X_SWITCH);
+                Serial.print(String(resp));
+                delay(50);
+            }
+
+
+            // wait for the second opto signal
+            resp = LOW;
+            while (resp != HIGH) {
+                resp = readSignal(X_SWITCH);
+                Serial.print(String(resp));
+                delay(50);
+            }
+            resp = HIGH;
+            while (resp != LOW) {
+                resp = readSignal(X_SWITCH);
+                Serial.print(String(resp));
+                delay(50);
+            }
+
+            // if no ICE, increment to not run just once
+            if (command.substring(0,2) == "ok") { i++; }
         }
 
-        // if no ICE, increment to not run just once
-        if (command.substring(0,2) == "ok") { i++; }
-      }
+        // turn N lap
+        moveTo(nbtours*steps_by_rev);
+        x=0;
 
-      // turn N lap
-      moveTo(nbtours*steps_by_rev);
-      x=0;
-  
-      // send a signal to the python gui
-      Serial.println("finished");
-      }
-
+        // send a signal to the python gui
+        Serial.println("finished");
+    }
 }
 
