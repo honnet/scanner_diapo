@@ -11,6 +11,17 @@
 #define X_ZEROSENSOR 3
 #define X_SWITCH     5
 
+#define DEBUG_PRINT  1
+
+#if DEBUG_PRINT
+#   define DPln(...)  Serial.println( __VA_ARGS__)
+#   define DP(...)    Serial.print( __VA_ARGS__)
+#else
+#   define DPln(...)
+#   define DP(...)
+#endif
+
+
 // global variables
 long x           = 0;       // current step position
 int steps_by_rev = 400;     // setting of the drive (nb steps/rev)
@@ -56,10 +67,10 @@ void searchZero(long initialSpeed, int searchDirection, unsigned long maxSteps) 
 
 void moveTo(int target) {
     unsigned long semiperiod;
-    //Serial.print("moveTo ");
-    //Serial.print(target, DEC);
-    //Serial.print(" speed=");
-    //Serial.println(speed);
+    DP("moveTo ");
+    DP(target, DEC);
+    DP(" speed=");
+    DPln(speed);
     // choose direction
 
     if (target == x)
@@ -92,13 +103,13 @@ void setup() {
     pinMode(X_ZEROSENSOR, INPUT);
     pinMode(X_SWITCH,     INPUT);
 
-    Serial.begin(9600);
+    Serial.begin(9600);                                                      // TODO 115200
     //digitalWrite(X_DIRECTION, HIGH);
     //digitalWrite(X_ENABLE, HIGH);
 
     // search zero at speed 400, forward, 800 steps max
     searchZero(400, 1, 2*steps_by_rev);
-    Serial.println("setup terminated");
+    DPln("setup terminated");
 }
 
 void loop() {
@@ -119,7 +130,7 @@ void loop() {
         moveTo(nbtours*steps_by_rev);
         x = 0;
         // send a signal to the python gui
-        Serial.println("command go terminated");
+        DPln("command go terminated");
         return;
     }
 
@@ -128,7 +139,7 @@ void loop() {
         // run twice in case of ICE
         for (int i = 0; i<=1; i++) {
             nbtours = command.substring(2, command.length()).toInt();
-            Serial.println("start procedure");
+            DPln("start procedure");
 
             // wait for the 2 opto signals
             for (int i = 0; i < 2; i++) {
