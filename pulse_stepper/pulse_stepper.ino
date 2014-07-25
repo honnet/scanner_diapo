@@ -131,8 +131,8 @@ void loop() {
         x = 0;
         // send a signal to the python gui
         DPln("command go terminated");
-        return;
-    }
+        return;                                                         // == goto loop
+    }                                                                   // XXX do we really want to return ?
 
     // full scan procedure
     if (command.substring(0,2) == "ok" || command.substring(0,2) == "ic") {
